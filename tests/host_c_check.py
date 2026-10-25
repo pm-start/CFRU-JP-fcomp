@@ -68,12 +68,12 @@ def main():
         exe = os.path.join(td, 'host_check.exe' if os.name == 'nt' else 'host_check')
         r = subprocess.run([cc, '-O1', '-fsanitize=undefined' if 'gcc' in cc and os.name != 'nt' else '-O1', '-I', os.path.join(HERE, 'host'),
                             '-o', exe, os.path.join(HERE, 'host', 'main.c'), os.path.join(HERE, '..', 'src', 'fcomp.c')],
-                           capture_output=True, text=True)
+                           capture_output=True, text=True, encoding='utf-8', errors='replace')
         os.remove(os.path.join(HERE, 'host', 'tables.inc'))
         if r.returncode:
             print(r.stderr)
             return 1
-        r = subprocess.run([exe, packed], capture_output=True, text=True)
+        r = subprocess.run([exe, packed], capture_output=True, text=True, encoding='utf-8', errors='replace')
         print(r.stdout.strip())
         return r.returncode
 

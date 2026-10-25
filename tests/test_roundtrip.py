@@ -17,6 +17,10 @@ import fcomp as F  # noqa: E402
 import fcomp_cli as C  # noqa: E402
 
 
+# 子プロセスの出力は UTF-8 に固定する (日本語 Windows の既定 cp932 でも読み違えない)
+ENV = dict(os.environ, PYTHONIOENCODING='utf-8')
+
+
 def synth_sheets(seed=1):
     """円・縞・ノイズなどの自作の図形を 4bpp (1 バイト = 2 画素) のタイルにしたもの"""
     rnd = random.Random(seed)
@@ -77,9 +81,10 @@ def main():
             files.append(fn)
         cli = os.path.join(HERE, '..', 'tools', 'fcomp_cli.py')
         out = os.path.join(td, 'out')
-        subprocess.run([sys.executable, cli, 'pack', out] + files + ['--mark', '0x80'], check=True, capture_output=True)
+        subprocess.run([sys.executable, cli, 'pack', out] + files + ['--mark', '0x80'], check=True, capture_output=True, env=ENV)
         assert open(os.path.join(out, '0000.fc'), 'rb').read(1) ==bytes([0x80])
-        r = subprocess.run([sys.executable, cli, 'unpack', out], check=True, capture_output=True, text=True)
+        r = subprocess.run([sys.executable, cli, 'unpack', out], check=True, capture_output=True, text=True,
+                           encoding='utf-8', errors='replace', env=ENV)
         assert r.stdout.count('OK') == 5 and 'NG' not in r.stdout, r.stdout
     print('CLI (--mark 0x80) OK')
     print('ALL OK')

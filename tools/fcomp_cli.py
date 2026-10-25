@@ -70,6 +70,9 @@ def unpack(out_dir):
 
 
 def main():
+    for stream in (sys.stdout, sys.stderr):        # 日本語 Windows (cp932) などでも落ちないように
+        if hasattr(stream, 'reconfigure'):
+            stream.reconfigure(encoding='utf-8', errors='replace')
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawTextHelpFormatter)
     sub = ap.add_subparsers(dest='cmd', required=True)
     a = sub.add_parser('pack')
